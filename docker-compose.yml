@@ -1,0 +1,89 @@
+version: '3.9'
+
+services:
+  # ===== Application (PHP-FPM) =====
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: baotang_app
+    volumes:
+      - ./backend:/var/www/html
+      - ./storage:/var/www/html/storage/app/public
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - baotang_net
+    restart: unless-stopped
+
+  # ===== Web Server (Nginx) =====
+  web:
+    image: nginx:1.27-alpine
+    container_name: baotang_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - baotang_net
+    restart: unless-stopped
+
+  # ===== Database (MySQL) =====
+  db:
+    image: mysql:8.0
+    container_name: baotang_db
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-baotang360}
+      MYSQL_USER: ${DB_USERNAME:-baotang_app}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-MatKhauManh123!}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-RootPassword123!}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD:-RootPassword123!}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - baotang_net
+    restart: unless-stopped
+
+  # ===== Python Service =====
+  python:
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    container_name: baotang_python
+    volumes:
+      - ./python-service:/app
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-baotang360}
+      - DB_USERNAME=${DB_USERNAME:-baotang_app}
+      - DB_PASSWORD=${DB_PASSWORD:-MatKhauManh123!}
+      - PY_SERVICE_TOKEN=${PY_SERVICE_TOKEN:-internal-token-change-me}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8001"
+    networks:
+      - baotang_net
+    restart: unless-stopped
+
+volumes:
+  db_data:
+
+networks:
+  baotang_net:
+    driver: bridge
