@@ -1,0 +1,51 @@
+# ===== PHP / Laravel =====
+/backend/vendor/
+/backend/storage/*.key
+/backend/storage/logs/*.log
+/backend/storage/framework/cache/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
+/backend/public/storage
+/backend/public/hot
+/backend/public/build
+
+# ===== Node / Vue =====
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.vite/
+
+# ===== Python =====
+/python-service/.venv/
+/python-service/__pycache__/
+*.pyc
+*.pyo
+
+# ===== Secrets =====
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+auth.json
+
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# ===== Large files =====
+/database/backup/*.sql
+/database/raw/*.csv
+/storage/tiles/
+/storage/panoramas/
+*.zip
+*.mp4
+*.mov
+
+# ===== Test artifacts =====
+/bao-cao-playwright/
+/test-results/
+/coverage/
