@@ -42,7 +42,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import pannellum from 'pannellum'
+import 'pannellum/build/pannellum.js'
 import { sceneApi, logApi } from '@/lib/api'
 import { useSession } from '@/composables/useSession'
 
@@ -85,13 +85,19 @@ async function loadScene(slug) {
     await nextTick()
 
     const config = buildConfig(data.data)
-    viewer.value = pannellum.viewer(viewerEl.value, config)
+
+    // Pannellum là UMD module, phải dùng window.pannellum
+    if (!window.pannellum) {
+      throw new Error('Pannellum chưa được load')
+    }
+
+    viewer.value = window.pannellum.viewer(viewerEl.value, config)
 
     enterTime = Date.now()
     logAction('view', null, 0)
   } catch (err) {
     console.error('Lỗi tải scene:', err)
-    error.value = 'Không tải được không gian tham quan. Vui lòng thử lại.'
+    error.value = 'Không tải được không gian tham quan: ' + err.message
   } finally {
     loading.value = false
   }

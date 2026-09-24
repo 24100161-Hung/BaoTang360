@@ -6,12 +6,6 @@ return [
     |--------------------------------------------------------------------------
     | Third Party Services
     |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
     */
 
     'postmark' => [
@@ -35,4 +29,10 @@ return [
         ],
     ],
 
-];
+    // 👇 PHẦN CẤU HÌNH PYTHON CỦA BẠN PHẢI NẰM Ở ĐÂY, BÊN TRONG DẤU NGOẶC VUÔNG
+    'python' => [
+        'url' => env('PY_SERVICE_URL', 'http://python:8001'),
+        'token' => env('PY_SERVICE_TOKEN'),
+    ],
+
+]; // 👈 DẤU NGOẶC VUÔNG ĐÓNG LẠI Ở CUỐI CÙNG
